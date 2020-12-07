@@ -28,6 +28,8 @@ class Dataset:
     def __init__(self, train_data_path, test_data_path):
         self.train_data = self.read_data(train_data_path)
         self.test_data = self.read_data(test_data_path)
+        self.train_mean = np.mean(self.train_data, axis=0)
+        self.train_std = np.std(self.train_data, axis=0)
 
     @staticmethod
     def read_data(data_path):
@@ -35,3 +37,16 @@ class Dataset:
         samples = train_file.readlines()
         sample_data = [list(map(float, sample.split())) for sample in samples]
         return np.array(sample_data)
+
+    def normalize_data(self):
+        train_data = (self.train_data - self.train_mean) / self.train_std
+        test_data = (self.test_data - self.train_mean) / self.train_std
+        return train_data, test_data
+
+    def denormalize_samples(self, samples):
+        denormalized = samples * self.train_std + self.train_mean
+        return denormalized
+
+    def denormalize_labels(self, labels):
+        denormalized = labels * self.train_std[1] + self.train_mean[1]
+        return denormalized

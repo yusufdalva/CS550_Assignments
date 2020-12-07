@@ -1,5 +1,5 @@
 from dataset_setup import *
-from network import *
+from ann import *
 
 DATA_FILE_NAMES = ["train1", "test1", "train2", "test2"]
 BASE_URL = "http://www.cs.bilkent.edu.tr/~gunduz/teaching/cs550/documents"
@@ -10,9 +10,9 @@ file_paths = download_data(DATA_FILE_NAMES, FILE_URLS)
 dataset_1 = Dataset(file_paths[0], file_paths[1])
 dataset_2 = Dataset(file_paths[2], file_paths[3])
 
-layers = [(4, 1, 'relu'), (1, 4, 'sigmoid')]
-network = Network(layers)
+network_1 = ANN(input_dim=1, weight_range=0.01, hidden_layer_enabled=False)
 
-for sample_idx in range(dataset_1.train_data.shape[0]):
-    y_pred = network.predict(dataset_1.train_data[sample_idx, :-1])
-    print(y_pred)
+network_2 = ANN(input_dim=1, weight_range=0.001, hidden_layer_enabled=True, hidden_units=20, activation="sigmoid")
+
+normalized_train, normalized_test = dataset_1.normalize_data()
+network_2.fit(normalized_train, 10000, learning_rate=0.005, update="sgd", momentum_enabled=True, alpha=0.1)
